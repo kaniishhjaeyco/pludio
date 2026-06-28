@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-black">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pludio — You're in!</title>
+  <meta name="description" content="Your Pludio Premium subscription is active. Head back to the app to start playing." />
+  <link rel='icon' type='image/png' href='pludio-icon.png'>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            tint: '#6823FF',
+            dark_tint: '#4c12c9',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html { overflow-x: hidden; }
+    body { font-family: Inter, system-ui, sans-serif; overflow-x: hidden; }
+    .glass-card {
+      background: linear-gradient(to top, rgba(132, 41, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 100%);
+    }
+    .page-glow {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .page-glow-purple {
+      bottom: 0;
+      width: 80%;
+      height: min(40vh, 420px);
+      background: radial-gradient(ellipse at center, rgba(134, 39, 255, 0.18) 0%, transparent 70%);
+      filter: blur(80px);
+    }
+    .page-glow-cyan {
+      top: 10%;
+      width: 90%;
+      height: min(60vh, 600px);
+      background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.12) 0%, transparent 75%);
+      filter: blur(100px);
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+  <div class="bg-black min-h-screen relative text-white overflow-x-hidden isolate">
+
+    <canvas id="star-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></canvas>
+    <div class="page-glow page-glow-purple" aria-hidden="true"></div>
+    <div class="page-glow page-glow-cyan" aria-hidden="true"></div>
+
+    <main class="relative z-10 min-h-screen flex items-center justify-center px-4 py-16">
+      <div class="relative overflow-hidden rounded-2xl backdrop-blur-md border border-purple-500/40 shadow-[0_0_50px_-10px_rgba(104,35,255,0.5)] p-8 sm:p-12 glass-card max-w-lg w-full text-center">
+        <span class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-purple-400/20"></span>
+        <div class="relative z-10">
+          <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-tint/20 border border-purple-400/30">
+            <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h1 class="text-white font-bold tracking-tight text-[32px] sm:text-[40px] leading-[1.1] mb-4">
+            You're all set! 🎉
+          </h1>
+          <p class="text-[#CCCAD1] text-lg leading-relaxed font-medium mb-2">
+            Your <span class="text-white font-semibold">Pludio Premium</span> subscription is active.
+          </p>
+          <p class="text-[#CCCAD1] text-base leading-relaxed mb-8">
+            Head back to the Pludio app to start playing through the syllabus, level by level. Your premium access is ready and waiting.
+          </p>
+          <a href="index.html" class="inline-block w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
+            Return to the app
+          </a>
+          <p class="text-gray-500 text-sm mt-6">
+            A confirmation has been sent to your email. You can close this tab.
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function initStars() {
+      const canvas = document.getElementById('star-canvas');
+      const ctx = canvas.getContext('2d');
+      let stars = [], w, h;
+      function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+      function createStars() {
+        stars = [];
+        const count = Math.floor((w * h) / 8000);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * w, y: Math.random() * h,
+            r: Math.random() * 1.2 + 0.3, base: Math.random() * 0.5 + 0.2,
+            speed: Math.random() * 0.02 + 0.005, phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+      function draw(t) {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          const opacity = s.base + Math.sin(t * s.speed + s.phase) * 0.35;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0.1, Math.min(1, opacity)) + ')';
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      resize(); createStars();
+      window.addEventListener('resize', () => { resize(); createStars(); });
+      requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>

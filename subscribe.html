@@ -124,6 +124,7 @@
             <p class="max-w-2xl mx-auto mt-4 sm:mt-6 text-[#CCCAD1] text-lg sm:text-xl leading-relaxed font-medium">
               Pick your age and subject, play through every level, and lock knowledge in — all on the Malaysian syllabus. One plan, all features.
             </p>
+            <div id="checkout-error" class="hidden max-w-xl mx-auto mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-3 text-sm text-red-200"></div>
           </div>
 
           <div class="grid gap-6 sm:gap-8 md:grid-cols-2 max-w-3xl mx-auto items-stretch">
@@ -156,7 +157,7 @@
                     <span>Cancel anytime</span>
                   </li>
                 </ul>
-                <button type="button" class="w-full bg-white/5 hover:bg-white/10 border border-white/15 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
+                <button type="button" data-checkout class="w-full bg-white/5 hover:bg-white/10 border border-white/15 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
                   Get Started
                 </button>
               </div>
@@ -194,7 +195,7 @@
                     <span>Cancel anytime</span>
                   </li>
                 </ul>
-                <button type="button" class="w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
+                <button type="button" data-checkout class="w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
                   Get Started
                 </button>
               </div>
@@ -265,6 +266,53 @@
       createStars();
       window.addEventListener('resize', () => { resize(); createStars(); });
       requestAnimationFrame(draw);
+    })();
+
+    // Stripe Checkout
+    (function initCheckout() {
+      const params = new URLSearchParams(window.location.search);
+      const email = (params.get('email') || '').trim();
+      const errorBox = document.getElementById('checkout-error');
+      const buttons = Array.from(document.querySelectorAll('[data-checkout]'));
+
+      function showError(message) {
+        if (!errorBox) return;
+        errorBox.textContent = message;
+        errorBox.classList.remove('hidden');
+      }
+
+      if (!email) {
+        showError('We couldn’t find your email. Please reopen this page from the Pludio app so we can link your subscription.');
+        buttons.forEach((btn) => { btn.disabled = true; });
+        return;
+      }
+
+      async function startCheckout(btn) {
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Redirecting…';
+        if (errorBox) errorBox.classList.add('hidden');
+        try {
+          const res = await fetch('/api/stripe/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.url) {
+            throw new Error(data.error || 'Something went wrong starting checkout.');
+          }
+          window.location.href = data.url;
+        } catch (err) {
+          showError(err.message || 'Unable to start checkout. Please try again.');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      }
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => startCheckout(btn));
+      });
     })();
   </script>
 </body>
