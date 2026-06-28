@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build / output
+.next/
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.turbo/
+
+# Test / tooling artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Deploy
+.vercel/
+.netlify/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
