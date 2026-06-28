@@ -10,8 +10,11 @@ const Stripe = require('stripe');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Pludio Premium plan (test mode).
-const PRICE_ID = 'price_1TnEp04Yqs0nQW3TscSL89kF';
+// Pludio Premium plan price IDs, keyed by billing interval.
+const PRICE_IDS = {
+  monthly: 'price_1TnGCr4Yqs0nQW3T0VKVwrSx',
+  yearly: 'price_1TnGDa4Yqs0nQW3TTtJbs2QN',
+};
 
 function getOrigin(req) {
   // Prefer an explicit env override so success/cancel URLs are stable in prod.
@@ -36,6 +39,17 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Missing email parameter.' });
   }
 
+  // Plan selection (defaults to monthly for backwards compatibility).
+  const plan =
+    (req.query && req.query.plan) ||
+    (req.body && req.body.plan) ||
+    'monthly';
+  const priceId = PRICE_IDS[plan];
+
+  if (!priceId) {
+    return res.status(400).json({ error: 'Invalid plan.' });
+  }
+
   try {
     const origin = getOrigin(req);
 
@@ -43,7 +57,7 @@ module.exports = async (req, res) => {
       mode: 'subscription',
       payment_method_types: ['card'],
       customer_email: email,
-      line_items: [{ price: PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/subscribe.html?email=${encodeURIComponent(email)}`,
       // Make the email available on the subscription too, so webhook events

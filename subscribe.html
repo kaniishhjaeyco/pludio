@@ -136,7 +136,7 @@
                 <h2 class="text-xl font-bold text-white mb-2">Monthly</h2>
                 <p class="text-gray-400 text-sm mb-6">Flexible month-to-month access.</p>
                 <div class="mb-6">
-                  <span class="text-4xl sm:text-5xl font-bold text-white">RM49</span>
+                  <span class="text-4xl sm:text-5xl font-bold text-white">RM149</span>
                   <span class="text-gray-400 text-base">/month</span>
                 </div>
                 <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-1">
@@ -157,7 +157,7 @@
                     <span>Cancel anytime</span>
                   </li>
                 </ul>
-                <button type="button" data-checkout class="w-full bg-white/5 hover:bg-white/10 border border-white/15 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
+                <button type="button" data-checkout data-plan="monthly" class="w-full bg-white/5 hover:bg-white/10 border border-white/15 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
                   Get Started
                 </button>
               </div>
@@ -167,16 +167,16 @@
             <div class="relative overflow-hidden rounded-2xl backdrop-blur-md border border-purple-500/40 shadow-[0_0_50px_-10px_rgba(104,35,255,0.5)] p-8 glass-card flex flex-col">
               <span class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-purple-400/20"></span>
               <div class="absolute top-5 right-5 z-20">
-                <span class="inline-block rounded-full bg-tint text-white text-xs font-bold px-3 py-1">Save RM189</span>
+                <span class="inline-block rounded-full bg-tint text-white text-xs font-bold px-3 py-1">Save RM298</span>
               </div>
               <div class="relative z-10 flex flex-col flex-1">
                 <h2 class="text-xl font-bold text-white mb-2">Yearly</h2>
                 <p class="text-gray-400 text-sm mb-6">Best value — two months free.</p>
                 <div class="mb-1">
-                  <span class="text-4xl sm:text-5xl font-bold text-white">RM399</span>
+                  <span class="text-4xl sm:text-5xl font-bold text-white">RM1,490</span>
                   <span class="text-gray-400 text-base">/year</span>
                 </div>
-                <p class="text-purple-300 text-sm mb-6">Just RM33.25/month, billed annually</p>
+                <p class="text-purple-300 text-sm mb-6">Just RM124/month, billed annually</p>
                 <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-1">
                   <li class="flex items-start gap-3">
                     <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -195,7 +195,7 @@
                     <span>Cancel anytime</span>
                   </li>
                 </ul>
-                <button type="button" data-checkout class="w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
+                <button type="button" data-checkout data-plan="yearly" class="w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed">
                   Get Started
                 </button>
               </div>
@@ -293,10 +293,11 @@
         btn.textContent = 'Redirecting…';
         if (errorBox) errorBox.classList.add('hidden');
         try {
+          const plan = btn.dataset.plan || 'monthly';
           const res = await fetch('/api/stripe/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ email, plan }),
           });
           const data = await res.json().catch(() => ({}));
           if (!res.ok || !data.url) {

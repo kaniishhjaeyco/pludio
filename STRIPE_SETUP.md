@@ -22,18 +22,18 @@ Set these in the Vercel project (and locally in `.env` — see `.env.example`):
 - `STRIPE_WEBHOOK_SECRET` — signing secret for the webhook endpoint (`whsec_...`)
 - `SUPABASE_URL` — your Supabase project URL
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase **service role** key (server-side only)
-- `SUPABASE_TABLE` — optional; defaults to `users`
+- `SUPABASE_TABLE` — optional; defaults to `profiles`
 
 > The publishable key is not needed by the current flow (we redirect to the
 > Stripe-hosted Checkout URL), but it is included per the spec for future use.
 
 ## Supabase table
 
-The webhook updates a row matched by `email` and expects these columns:
+The webhook updates the `profiles` table, matching a row by `email` and setting
+`is_subscribed`. Expected columns:
 
 - `email` (text)
 - `is_subscribed` (boolean)
-- `subscription_end_date` (timestamptz, nullable)
 
 ## Webhook configuration
 

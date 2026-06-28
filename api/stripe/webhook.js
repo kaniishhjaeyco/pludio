@@ -2,7 +2,7 @@
 //
 // Runs as a Vercel serverless function at /api/stripe/webhook.
 // Listens for:
-//   - checkout.session.completed     → is_subscribed = true (+ subscription_end_date)
+//   - checkout.session.completed     → is_subscribed = true
 //   - customer.subscription.deleted  → is_subscribed = false
 //   - invoice.payment_failed         → is_subscribed = false
 //
@@ -20,9 +20,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Supabase table that holds the per-user subscription flags.
+// Supabase table that holds the per-user subscription flag.
 // Override with SUPABASE_TABLE if your table is named differently.
-const TABLE = process.env.SUPABASE_TABLE || 'users';
+const TABLE = process.env.SUPABASE_TABLE || 'profiles';
 
 function readRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -35,15 +35,15 @@ function readRawBody(req) {
   });
 }
 
-// Updates the subscription columns for the row matching `email`.
-async function updateSubscriptionByEmail(email, fields) {
+// Sets is_subscribed for the row matching `email`.
+async function setSubscribed(email, isSubscribed) {
   if (!email) {
     console.warn('Webhook event had no email; skipping Supabase update.');
     return;
   }
   const { data, error } = await supabase
     .from(TABLE)
-    .update(fields)
+    .update({ is_subscribed: isSubscribed })
     .eq('email', email)
     .select('email');
 
@@ -91,22 +91,7 @@ module.exports = async (req, res) => {
           (session.metadata && session.metadata.email) ||
           (await emailFromCustomer(session.customer));
 
-        let subscriptionEndDate = null;
-        if (session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription
-          );
-          if (subscription.current_period_end) {
-            subscriptionEndDate = new Date(
-              subscription.current_period_end * 1000
-            ).toISOString();
-          }
-        }
-
-        await updateSubscriptionByEmail(email, {
-          is_subscribed: true,
-          subscription_end_date: subscriptionEndDate,
-        });
+        await setSubscribed(email, true);
         break;
       }
 
@@ -116,7 +101,7 @@ module.exports = async (req, res) => {
           (subscription.metadata && subscription.metadata.email) ||
           (await emailFromCustomer(subscription.customer));
 
-        await updateSubscriptionByEmail(email, { is_subscribed: false });
+        await setSubscribed(email, false);
         break;
       }
 
@@ -126,7 +111,7 @@ module.exports = async (req, res) => {
           invoice.customer_email ||
           (await emailFromCustomer(invoice.customer));
 
-        await updateSubscriptionByEmail(email, { is_subscribed: false });
+        await setSubscribed(email, false);
         break;
       }
 
