@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pludio — Study less. Know more. Play more.</title>
   <meta name="description" content="Upload your textbook. We break it into bite-sized levels. Play through your lessons and lock knowledge in automatically." />
-  <link rel='icon' type='image/png' href='pludio-logo.png'>
+  <link rel='icon' type='image/png' href='pludio-icon.png'>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -82,20 +82,6 @@
       width: max-content;
       animation: infinite-scroll 30s linear infinite;
     }
-    .highlight-purple {
-      background-color: rgba(104, 35, 255, 0.28);
-      border-radius: 100px;
-      padding: 0 2px;
-    }
-    #waitlist-success { display: none; }
-    #waitlist-success.show { display: block; }
-    .logo { width: auto; object-fit: contain; display: block; }
-    .logo-nav { height: 48px; }
-    @media (min-width: 640px) {
-      .logo-nav { height: 52px; }
-    }
-    .logo-cta { height: 72px; margin: 0 auto 1.5rem; }
-    .logo-footer { height: 56px; }
     .page-glow {
       position: fixed;
       left: 50%;
@@ -139,17 +125,16 @@
       <header class="fixed top-0 left-0 right-0 py-2 sm:py-3 w-full z-50">
         <nav class="flex justify-center px-4">
           <div class="relative flex w-[90%] sm:w-full max-w-5xl items-center justify-between rounded-full border border-white/10 bg-white/5 bg-gradient-to-r from-indigo-900/20 via-indigo-700/15 to-indigo-900/20 px-3 sm:px-6 py-2 sm:py-2.5 min-h-[52px] backdrop-blur-sm">
-            <a aria-label="Pludio home" href="#" class="flex-shrink-0">
-              <img src="pludio-wordmark.png" alt="Pludio" class="logo logo-nav" />
+            <a aria-label="Pludio home" href="#" class="flex-shrink-0 flex items-center gap-2.5">
+              <img src="pludio-icon.png" alt="" class="h-9 sm:h-10 w-auto rounded-[10px]" />
+              <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Pludio</span>
             </a>
             <div class="hidden sm:flex items-center gap-6 text-sm text-gray-300">
               <a href="#features" class="hover:text-white transition-colors">Features</a>
               <a href="#how-it-works" class="hover:text-white transition-colors">How it works</a>
-              <a href="#testimonials" class="hover:text-white transition-colors">Reviews</a>
-              <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
             </div>
-            <a href="#waitlist" class="bg-tint hover:bg-dark_tint transition-all duration-200 rounded-xl border border-white/10 py-2 px-4 sm:px-6 text-sm font-bold text-white whitespace-nowrap">
-              Get early access
+            <a href="subscribe.html" class="bg-tint hover:bg-dark_tint transition-all duration-200 rounded-xl border border-white/10 py-2 px-4 sm:px-6 text-sm font-bold text-white whitespace-nowrap">
+              Subscribe
             </a>
           </div>
         </nav>
@@ -157,79 +142,13 @@
 
       <!-- Hero -->
       <section class="px-4 sm:px-6 lg:px-8 pb-20 sm:pb-32 pt-40 sm:pt-52 relative">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center max-w-7xl mx-auto">
-          <div class="flex flex-col items-center lg:items-start text-center lg:text-left relative z-10">
-            <div class="space-y-4 sm:space-y-6">
-              <a href="#waitlist" class="inline-flex items-center gap-3 px-6 py-2.5 sm:px-8 sm:py-3 rounded-full border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-purple-600/5 backdrop-blur-sm hover:from-purple-500/10 hover:to-purple-600/10 hover:border-purple-400/30 transition-all duration-300 group w-fit">
-                <span class="text-base sm:text-lg">🎮</span>
-                <span class="text-sm sm:text-md font-semibold text-white group-hover:text-purple-200 transition-colors">Early access now open — join the waitlist →</span>
-              </a>
-              <h1 class="text-white font-bold tracking-tight text-[40px] sm:text-[52px] lg:text-[56px] leading-[1.05] sm:leading-[1.05]">
-                You were never bad at studying. You were just doing it wrong.
-              </h1>
-              <h2 class="max-w-none lg:mr-auto mt-4 sm:mt-6 text-[#CCCAD1] text-lg sm:text-2xl md:text-3xl leading-relaxed font-medium">
-                Upload your textbook. We do the rest. Barely any memorizing. No re-reading. Just play!
-              </h2>
-
-              <!-- Waitlist form -->
-              <div id="waitlist" class="pt-4 flex flex-col items-center lg:items-start w-full max-w-md">
-                <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3 w-full">
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    placeholder="Enter your email"
-                    class="flex-1 min-w-0 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 backdrop-blur-sm"
-                  />
-                  <button
-                    type="submit"
-                    class="bg-tint hover:bg-dark_tint transition-all duration-200 ease-in-out flex items-center justify-center rounded-xl border border-white/10 py-3 px-6 gap-1.5 font-bold text-white whitespace-nowrap"
-                  >
-                    Get early access
-                  </button>
-                </form>
-                <p id="waitlist-success" class="mt-3 text-sm text-purple-300 font-medium">You're on the list! We'll be in touch soon. 🎮</p>
-
-                <!-- 14-day countdown -->
-                <div id="countdown" class="mt-6 flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4">
-                  <div class="text-center min-w-[64px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-3 py-2">
-                    <span id="cd-days" class="block text-2xl sm:text-3xl font-bold text-white">14</span>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Days</span>
-                  </div>
-                  <div class="text-center min-w-[64px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-3 py-2">
-                    <span id="cd-hours" class="block text-2xl sm:text-3xl font-bold text-white">00</span>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Hours</span>
-                  </div>
-                  <div class="text-center min-w-[64px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-3 py-2">
-                    <span id="cd-mins" class="block text-2xl sm:text-3xl font-bold text-white">00</span>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Mins</span>
-                  </div>
-                  <div class="text-center min-w-[64px] rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm px-3 py-2">
-                    <span id="cd-secs" class="block text-2xl sm:text-3xl font-bold text-white">00</span>
-                    <span class="text-xs text-gray-400 uppercase tracking-wide">Secs</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Demo iframe -->
-          <div class="relative z-10 flex justify-center lg:justify-end">
-            <div
-              id="demo-embed"
-              class="w-full relative overflow-hidden"
-              style="background:linear-gradient(135deg, rgba(104,35,255,0.08) 0%, rgba(0,0,0,0.4) 100%); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:0; box-shadow:0 0 40px -10px rgba(104,35,255,0.4);"
-            >
-              <iframe
-                id="demo-iframe"
-                src="demo.html"
-                width="800"
-                height="500"
-                style="border:none; display:block; transform-origin: top left;"
-                scrolling="no"
-              ></iframe>
-            </div>
-          </div>
+        <div class="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
+          <h1 class="text-white font-bold tracking-tight text-[40px] sm:text-[52px] lg:text-[56px] leading-[1.05] sm:leading-[1.05]">
+            You were never bad at studying. You were just doing it wrong.
+          </h1>
+          <h2 class="max-w-2xl mt-4 sm:mt-6 text-[#CCCAD1] text-lg sm:text-2xl md:text-3xl leading-relaxed font-medium">
+            Upload your textbook. We do the rest. Barely any memorizing. No re-reading. Just play!
+          </h2>
         </div>
 
         <!-- University marquee -->
@@ -238,32 +157,28 @@
           <div class="marquee-mask marquee-viewport">
             <div class="marquee-track whitespace-nowrap">
               <div class="flex gap-12 items-center px-6 min-w-max text-gray-400 text-lg sm:text-xl font-medium">
-                <span>History</span><span class="text-purple-500/60">•</span>
-                <span>Biology</span><span class="text-purple-500/60">•</span>
-                <span>Economics</span><span class="text-purple-500/60">•</span>
-                <span>Law</span><span class="text-purple-500/60">•</span>
-                <span>Psychology</span><span class="text-purple-500/60">•</span>
-                <span>Chemistry</span><span class="text-purple-500/60">•</span>
+                <span>Asas Sains Komputer</span><span class="text-purple-500/60">•</span>
+                <span>Geografi</span><span class="text-purple-500/60">•</span>
                 <span>Mathematics</span><span class="text-purple-500/60">•</span>
-                <span>Geography</span><span class="text-purple-500/60">•</span>
-                <span>Literature</span><span class="text-purple-500/60">•</span>
+                <span>Pendidikan Moral</span><span class="text-purple-500/60">•</span>
+                <span>Science</span><span class="text-purple-500/60">•</span>
+                <span>Sejarah</span><span class="text-purple-500/60">•</span>
+                <span>Additional Mathematics</span><span class="text-purple-500/60">•</span>
+                <span>Biology</span><span class="text-purple-500/60">•</span>
+                <span>Chemistry</span><span class="text-purple-500/60">•</span>
                 <span>Physics</span><span class="text-purple-500/60">•</span>
-                <span>Sociology</span><span class="text-purple-500/60">•</span>
-                <span>Business</span><span class="text-purple-500/60">•</span>
               </div>
               <div class="flex gap-12 items-center px-6 min-w-max text-gray-400 text-lg sm:text-xl font-medium" aria-hidden="true">
-                <span>History</span><span class="text-purple-500/60">•</span>
-                <span>Biology</span><span class="text-purple-500/60">•</span>
-                <span>Economics</span><span class="text-purple-500/60">•</span>
-                <span>Law</span><span class="text-purple-500/60">•</span>
-                <span>Psychology</span><span class="text-purple-500/60">•</span>
-                <span>Chemistry</span><span class="text-purple-500/60">•</span>
+                <span>Asas Sains Komputer</span><span class="text-purple-500/60">•</span>
+                <span>Geografi</span><span class="text-purple-500/60">•</span>
                 <span>Mathematics</span><span class="text-purple-500/60">•</span>
-                <span>Geography</span><span class="text-purple-500/60">•</span>
-                <span>Literature</span><span class="text-purple-500/60">•</span>
+                <span>Pendidikan Moral</span><span class="text-purple-500/60">•</span>
+                <span>Science</span><span class="text-purple-500/60">•</span>
+                <span>Sejarah</span><span class="text-purple-500/60">•</span>
+                <span>Additional Mathematics</span><span class="text-purple-500/60">•</span>
+                <span>Biology</span><span class="text-purple-500/60">•</span>
+                <span>Chemistry</span><span class="text-purple-500/60">•</span>
                 <span>Physics</span><span class="text-purple-500/60">•</span>
-                <span>Sociology</span><span class="text-purple-500/60">•</span>
-                <span>Business</span><span class="text-purple-500/60">•</span>
               </div>
             </div>
           </div>
@@ -379,8 +294,8 @@
         <div class="max-w-4xl mx-auto rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8 sm:p-10">
           <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
             <div class="text-center">
-              <p class="text-3xl sm:text-4xl font-bold text-white mb-1">20 min</p>
-              <p class="text-sm text-gray-400">Average time per chapter</p>
+              <p class="text-3xl sm:text-4xl font-bold text-white mb-1">Bite-sized</p>
+              <p class="text-sm text-gray-400">Levels, not chapters</p>
             </div>
             <div class="hidden md:block w-px h-12 bg-white/10"></div>
             <div class="text-center">
@@ -393,136 +308,6 @@
               <p class="text-sm text-gray-400">Not days</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- Testimonials -->
-      <section id="testimonials" class="px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div class="max-w-6xl mx-auto">
-          <div class="flex items-center gap-3 mb-10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <h2 class="text-2xl font-normal text-white">Beta tester love</h2>
-          </div>
-          <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">Alex M. — Psychology Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"I used to re-read the same chapter three times and still blank on the exam. With Pludio I <span class="highlight-purple text-white">finished psych in 20 minutes</span> and actually remembered the theories."</p>
-              </div>
-            </li>
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">Sarah K. — Pre-med Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"Organic chem felt impossible until I tried Pludio. <span class="highlight-purple text-white">Levels + questions after each one</span> — I went from dreading study sessions to actually looking forward to them."</p>
-              </div>
-            </li>
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">James T. — CS Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"I uploaded my algorithms textbook and had <span class="highlight-purple text-white">playable levels by morning</span>. No flashcard apps, no manual splitting — just upload and go."</p>
-              </div>
-            </li>
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">Maya R. — Business Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"Finals week used to mean all-nighters. Pludio got me through <span class="highlight-purple text-white">two chapters in under an hour</span> with stuff actually sticking. Game changer."</p>
-              </div>
-            </li>
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">Daniel K. — History Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"Reading 80 pages of dense history was brutal. Pludio turned it into <span class="highlight-purple text-white">short levels I could knock out between classes</span> — and I retained way more."</p>
-              </div>
-            </li>
-            <li class="relative overflow-hidden rounded-xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-6 glass-card">
-              <span class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/8"></span>
-              <div class="relative">
-                <div class="mb-4">
-                  <h4 class="font-normal text-white text-lg">Lisa P. — Engineering Student</h4>
-                  <p class="text-gray-500 text-xs mt-1">Beta tester</p>
-                </div>
-                <p class="text-gray-300 text-sm leading-relaxed">"The question-after-every-level thing isn't a gimmick — <span class="highlight-purple text-white">it's how I finally stopped forgetting thermo</span> the week after the midterm."</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- FAQ -->
-      <section id="faq">
-        <div class="px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div class="max-w-3xl mx-auto">
-            <div class="text-center mb-12">
-              <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-              <p class="text-lg text-gray-400">Everything you need to know about Pludio</p>
-            </div>
-            <div class="space-y-4" id="faq-list">
-              <div class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                <button type="button" class="faq-toggle w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors">
-                  <span class="font-medium text-white pr-4">How does Pludio turn my textbook into levels?</span>
-                  <svg class="faq-icon w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="faq-panel hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">Upload any PDF textbook and our AI analyzes the structure — chapters, sections, and key concepts — then splits it into bite-sized levels you can play through one at a time.</div>
-              </div>
-              <div class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                <button type="button" class="faq-toggle w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors">
-                  <span class="font-medium text-white pr-4">Do I still need to memorize everything?</span>
-                  <svg class="faq-icon w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="faq-panel hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">Barely. Each level ends with a question that locks the content into memory through active recall — the same technique top students use, built into every level automatically.</div>
-              </div>
-              <div class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                <button type="button" class="faq-toggle w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors">
-                  <span class="font-medium text-white pr-4">What file types can I upload?</span>
-                  <svg class="faq-icon w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="faq-panel hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">PDF textbooks work best today. We're expanding to more formats during early access — join the waitlist to get updates.</div>
-              </div>
-              <div class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                <button type="button" class="faq-toggle w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors">
-                  <span class="font-medium text-white pr-4">How long does it take per chapter?</span>
-                  <svg class="faq-icon w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="faq-panel hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">Beta testers average about 20 minutes per chapter — compared to hours of re-reading and making flashcards the old way.</div>
-              </div>
-              <div class="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-                <button type="button" class="faq-toggle w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors">
-                  <span class="font-medium text-white pr-4">When can I get access?</span>
-                  <svg class="faq-icon w-5 h-5 text-gray-400 flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="faq-panel hidden px-6 pb-4 text-gray-400 text-sm leading-relaxed">Early access is open now. Join the waitlist above — we'll email you an invite as spots open up during our beta rollout.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CTA -->
-      <section class="px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div class="max-w-2xl mx-auto rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-10 glass-card">
-          <img src="pludio-wordmark.png" alt="Pludio" class="logo logo-cta" />
-          <p class="text-gray-300 mb-6">Your textbook is waiting. Be first when we launch.</p>
-          <a href="#waitlist" class="inline-block bg-tint hover:bg-dark_tint transition-all duration-200 rounded-xl border border-white/10 py-3 px-8 font-bold text-white">Get early access</a>
         </div>
       </section>
 
@@ -540,8 +325,6 @@
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsrGxzooqy-5rkMkAnOkrC0xp7GLmCcnp6mQi8sHo-JS4GBmZeDD-RhRDSJ9xdhSxl/exec';
-
     // Star canvas
     (function initStars() {
       const canvas = document.getElementById('star-canvas');
@@ -585,84 +368,6 @@
       createStars();
       window.addEventListener('resize', () => { resize(); createStars(); });
       requestAnimationFrame(draw);
-    })();
-
-    // 14-day countdown (ends June 11, 2026)
-    (function initCountdown() {
-      const endDate = new Date('2026-06-11T23:59:59');
-
-      function tick() {
-        const now = new Date();
-        let diff = Math.max(0, endDate - now);
-        const days = Math.floor(diff / 86400000);
-        diff -= days * 86400000;
-        const hours = Math.floor(diff / 3600000);
-        diff -= hours * 3600000;
-        const mins = Math.floor(diff / 60000);
-        diff -= mins * 60000;
-        const secs = Math.floor(diff / 1000);
-        document.getElementById('cd-days').textContent = String(days);
-        document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-        document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
-        document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
-      }
-      tick();
-      setInterval(tick, 1000);
-    })();
-
-    // Waitlist form
-    document.getElementById('waitlist-form').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const email = new FormData(e.target).get('email');
-      const btn = e.target.querySelector('button[type="submit"]');
-      btn.disabled = true;
-
-      if (GOOGLE_SCRIPT_URL) {
-        try {
-          await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, source: 'landing' }),
-          });
-        } catch (_) { /* no-cors may not surface errors */ }
-      }
-
-      e.target.style.display = 'none';
-      document.getElementById('waitlist-success').classList.add('show');
-    });
-
-    // FAQ accordion
-    document.querySelectorAll('.faq-toggle').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const panel = btn.nextElementSibling;
-        const icon = btn.querySelector('.faq-icon');
-        const isOpen = !panel.classList.contains('hidden');
-        document.querySelectorAll('.faq-panel').forEach((p) => p.classList.add('hidden'));
-        document.querySelectorAll('.faq-icon').forEach((i) => i.classList.remove('rotate-180'));
-        if (!isOpen) {
-          panel.classList.remove('hidden');
-          icon.classList.add('rotate-180');
-        }
-      });
-    });
-
-    // Demo iframe: scale 800x500 to fit container width
-    (function initDemoEmbedScale() {
-      const container = document.getElementById('demo-embed');
-      const iframe = document.getElementById('demo-iframe');
-      if (!container || !iframe) return;
-
-      function update() {
-        const w = container.clientWidth || 0;
-        if (!w) return;
-        const scale = Math.min(1, w / 800);
-        iframe.style.transform = `scale(${scale})`;
-        container.style.height = `${Math.round(500 * scale)}px`;
-      }
-
-      update();
-      window.addEventListener('resize', update, { passive: true });
     })();
   </script>
 </body>

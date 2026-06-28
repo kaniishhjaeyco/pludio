@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=390, height=844, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Pludio — Demo (Portrait)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg: #0A0A1A;
+      --panel: #0F1525;
+      --border: #1E2A45;
+      --muted: #9CA3AF;
+      --muted2: #6B7280;
+      --text: #FFFFFF;
+      --purple: #7C3AED;
+      --yellow: #FBBF24;
+      --green: #22C55E;
+      --grayNode: #2A2A4E;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    /* Portrait container: exactly 390×844 */
+    .demo{
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .scene{
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+    .scene.active{
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .scene.fadeOnly{ transform: none; }
+    .scene.fadeOnly.active{ transform: none; }
+
+    .center{ position: absolute; inset: 0; display: grid; place-items: center; }
+    .stack{ display: grid; gap: 12px; }
+    .muted{ color: var(--muted); }
+    .muted2{ color: var(--muted2); }
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .btn{
+      height: 52px;
+      border-radius: 14px;
+      border: 0;
+      background: var(--purple);
+      color: white;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: .1px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      user-select: none;
+      box-shadow: 0 10px 24px rgba(124,58,237,.22);
+    }
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+
+    /* Transition helpers */
+    .slideFromRight{ transform: translateX(18px); }
+    .slideFromRight.active{ transform: translateX(0); }
+    .slideFromBottom{ transform: translateY(18px); }
+    .slideFromBottom.active{ transform: translateY(0); }
+
+    /* ── SCENE 1: Upload ── */
+    .upload-zone{
+      width: 340px;
+      height: 155px;
+      border: 2px dashed rgba(124,58,237,.95);
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      gap: 8px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .upload-zone .title{ font-size: 16px; font-weight: 700; }
+    .upload-zone .sub{ font-size: 13px; }
+    .upload-icon{ width: 40px; height: 40px; color: var(--purple); }
+
+    .file-wrap{
+      width: 340px;
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+    .file-card{
+      width: 340px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 12px;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    .file-card.show{
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 520ms ease, transform 520ms cubic-bezier(.2,.9,.25,1.15);
+    }
+    .pdf-icon{ width: 32px; height: 32px; color: var(--purple); }
+    .file-name{ font-weight: 800; font-size: 14px; }
+    .file-meta{ font-size: 12px; }
+
+    .progress{
+      width: 340px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(124,58,237,.15);
+      overflow: hidden;
+    }
+    .progress > .bar{
+      width: 0%;
+      height: 100%;
+      background: var(--purple);
+      border-radius: 2px;
+      box-shadow: 0 0 16px rgba(124,58,237,.45);
+    }
+    .status{ font-size: 12px; }
+
+    /* ── SCENE 2: Processing ── */
+    .top-note{
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .big-number{
+      font-size: 84px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      text-align: center;
+    }
+    .levels-label{
+      text-align: center;
+      font-size: 17px;
+      color: var(--yellow);
+      font-weight: 800;
+      margin-top: 8px;
+    }
+    .processing-sub{
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .dots{
+      display: flex;
+      width: 100%;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--purple);
+      animation: pulseDot 900ms ease-in-out infinite;
+      transform-origin: center;
+    }
+    .dot:nth-child(2){ animation-delay: 200ms; }
+    .dot:nth-child(3){ animation-delay: 400ms; }
+    @keyframes pulseDot{
+      0%, 100%{ transform: scale(1); opacity: .65; }
+      50%{ transform: scale(1.4); opacity: 1; }
+    }
+    .bottom-progress{
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 4px;
+      width: 100%;
+      background: rgba(124,58,237,.12);
+    }
+    .bottom-progress .bar{
+      height: 100%;
+      width: 0%;
+      background: var(--purple);
+      box-shadow: 0 0 20px rgba(124,58,237,.45);
+    }
+
+    /* ── SCENE 3/8: Level Map — portrait native coordinates ── */
+    .topbar{
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-weight: 800;
+      font-size: 15px;
+      background: linear-gradient(to bottom, rgba(10,10,26,.9), rgba(10,10,26,0));
+      z-index: 2;
+    }
+    .xp{
+      font-size: 14px;
+      color: var(--yellow);
+      font-weight: 800;
+    }
+    .map{
+      position: absolute;
+      inset: 54px 0 0 0;
+      overflow: hidden;
+    }
+    /* Portrait map: full 390-wide, no transform scaling needed */
+    .map-stage{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .map-stage .path{
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 70px, rgba(0,0,0,1) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 70px, rgba(0,0,0,1) 100%);
+    }
+    .map-stage .path,
+    .map-stage .nodes{
+      position: absolute;
+      inset: 0;
+    }
+    .map.gentleScale{
+      animation: mapScaleDown 1s ease forwards;
+    }
+    @keyframes mapScaleDown{
+      from{ transform: scale(1.04); }
+      to{ transform: scale(1); }
+    }
+    .path{
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: .95;
+    }
+    .nodes{
+      position: absolute;
+      inset: 0;
+    }
+    .node{
+      position: absolute;
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: white;
+      transform: translate(-50%, -50%) scale(.6);
+      opacity: 0;
+    }
+    .node > span{ font-size: 22px; }
+    .node.show{
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      transition: opacity 320ms ease, transform 420ms cubic-bezier(.2,1.35,.25,1);
+    }
+    .node-label{
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 8px);
+      transform: translateX(-50%);
+      max-width: 150px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFFFFF;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0;
+    }
+    .node.show .node-label{ opacity: 1; transition: opacity 420ms ease 120ms; }
+    .node.dim .node-label{ color: rgba(255,255,255,.55); }
+    .node.locked{ background: var(--grayNode); }
+    .node.unlocked{ background: var(--purple); box-shadow: 0 0 22px rgba(124,58,237,.7); }
+    .node.gold{ background: var(--yellow); color: #111827; box-shadow: 0 0 18px rgba(251,191,36,.35); }
+    .node.complete{ background: var(--green); box-shadow: none; }
+    .node.pulse{ animation: nodePulse 1.7s ease-in-out infinite; }
+    @keyframes nodePulse{
+      0%, 100%{ box-shadow: 0 0 20px rgba(124,58,237,.5); transform: translate(-50%, -50%) scale(1); }
+      50%{ box-shadow: 0 0 30px rgba(124,58,237,.85); transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    .node .node-lock,
+    .node .node-num{
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+    .node .node-num{
+      opacity: 0;
+      transform: scale(.9);
+      transition: opacity 220ms ease, transform 220ms cubic-bezier(.2,1.25,.25,1);
+    }
+    .node .node-lock{
+      opacity: 1;
+      transition: opacity 260ms ease;
+    }
+    .node.flash{
+      background: #FFFFFF !important;
+      box-shadow: 0 0 26px rgba(255,255,255,.35);
+      transition: background 140ms ease, box-shadow 140ms ease;
+    }
+    .node.unlockedState{
+      background: var(--purple) !important;
+      box-shadow: 0 0 24px rgba(124,58,237,.75);
+      transition: background 280ms ease, box-shadow 280ms ease;
+    }
+    .node.unlockedState .node-lock{ opacity: 0; }
+    .node.unlockedState .node-num{ opacity: 1; transform: scale(1); }
+
+    .node.locked svg,
+    .node .node-lock svg{
+      width: 22px;
+      height: 22px;
+    }
+
+    /* ── SCENE 4: Bottom sheet ── */
+    .sheet{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 42%;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%);
+      padding: 20px 24px;
+      z-index: 3;
+    }
+    .sheet.show{
+      transform: translateY(0);
+      transition: transform 520ms cubic-bezier(.2,.9,.25,1.15);
+    }
+    .handle{
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.2);
+      margin: 0 auto 18px;
+    }
+    .sheet-inner{
+      display: grid;
+      gap: 12px;
+    }
+    .sheet-title{ font-size: 20px; font-weight: 800; }
+    .sheet-stats{ display: flex; gap: 20px; font-size: 13px; color: var(--muted); }
+
+    .tap{
+      animation: tapBounce 300ms cubic-bezier(.2,1.35,.25,1);
+    }
+    @keyframes tapBounce{
+      0%{ transform: translate(-50%, -50%) scale(1); }
+      50%{ transform: translate(-50%, -50%) scale(1.3); }
+      100%{ transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* ── SCENE 5/6: Lesson / Question ── */
+    .lesson-top{
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-dots{
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .pdot{
+      border-radius: 999px;
+      background: rgba(255,255,255,.22);
+      width: 6px;
+      height: 6px;
+    }
+    .pdot.active{ width: 8px; height: 8px; background: var(--purple); box-shadow: 0 0 14px rgba(124,58,237,.5); }
+    .lesson-xp{
+      position: absolute;
+      right: 0;
+      top: 0;
+      transform: translateY(2px);
+      font-size: 13px;
+      color: var(--yellow);
+      font-weight: 800;
+    }
+    .lesson-bar{
+      position: absolute;
+      top: 48px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(124,58,237,.14);
+    }
+    .lesson-bar .fill{
+      height: 100%;
+      width: 0%;
+      background: var(--purple);
+      box-shadow: 0 0 18px rgba(124,58,237,.45);
+      transition: width 520ms ease;
+    }
+    .lesson-badge{
+      margin: 22px auto 14px;
+      width: fit-content;
+      background: var(--purple);
+      color: white;
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      box-shadow: 0 0 18px rgba(124,58,237,.35);
+    }
+    .lesson-card{
+      margin: 0 20px;
+      padding: 22px;
+      border-radius: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      min-height: 180px;
+      display: grid;
+      gap: 12px;
+    }
+    .lesson-kicker{
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .lesson-text{
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.94);
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .lesson-text.show{
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .bottom-cta{
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      bottom: 24px;
+    }
+
+    .question{
+      margin: 86px 20px 0;
+      text-align: center;
+      font-weight: 800;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    .answers{
+      margin: 20px 20px 0;
+      display: grid;
+      gap: 10px;
+    }
+    .answer{
+      height: 52px;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--grayNode);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 14px;
+      color: white;
+      opacity: 0;
+      transform: translateX(26px);
+    }
+    .answer.in{
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 360ms ease, transform 420ms cubic-bezier(.2,1.2,.25,1);
+    }
+    .answer.dim{ opacity: .3 !important; }
+    .answer.correct{
+      background: var(--green);
+      border-color: rgba(34,197,94,.65);
+      color: white;
+      transition: background 280ms ease, border-color 280ms ease;
+    }
+    .answer .check{
+      width: 18px; height: 18px;
+      opacity: 0;
+      transform: scale(.7);
+    }
+    .answer.correct .check{
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 220ms ease, transform 220ms cubic-bezier(.2,1.25,.25,1);
+    }
+    .xp-float{
+      position: absolute;
+      color: var(--yellow);
+      font-weight: 800;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(0);
+      pointer-events: none;
+    }
+    .xp-float.fly{
+      opacity: 1;
+      animation: xpFly 800ms ease forwards;
+    }
+    @keyframes xpFly{
+      0%{ transform: translateY(0); opacity: 1; }
+      100%{ transform: translateY(-40px); opacity: 0; }
+    }
+
+    /* ── SCENE 7: Level Complete ── */
+    .complete{
+      background: #1A0A3E;
+    }
+    .center-stack{
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .complete-inner{
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+    .trophy{
+      font-size: 64px;
+      transform: scale(0);
+      opacity: 1;
+    }
+    .trophy.in{ animation: popBounce 420ms cubic-bezier(.2,1.35,.25,1) forwards; }
+    .complete-title{
+      font-size: 26px;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .complete-title.in{ opacity: 1; transform: translateY(0); transition: opacity 420ms ease, transform 420ms ease; }
+    .stars{
+      font-size: 26px;
+      letter-spacing: 2px;
+      display: inline-flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .star{
+      transform: scale(0);
+      opacity: 1;
+    }
+    .star.in{ animation: popBounce 420ms cubic-bezier(.2,1.35,.25,1) forwards; }
+    @keyframes popBounce{
+      0%{ transform: scale(0); }
+      70%{ transform: scale(1.2); }
+      100%{ transform: scale(1); }
+    }
+    .earned{
+      color: var(--yellow);
+      font-size: 15px;
+      font-weight: 800;
+      opacity: 0;
+    }
+    .earned.in{ opacity: 1; transition: opacity 420ms ease; }
+    .xpbar{
+      width: 220px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.12);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .xpbar .fill{
+      width: 0%;
+      height: 100%;
+      background: var(--purple);
+      box-shadow: 0 0 20px rgba(124,58,237,.45);
+      border-radius: 3px;
+      transition: width 800ms ease;
+    }
+
+    .confetti{
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      opacity: .95;
+      animation-name: confFall;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+      will-change: transform, opacity;
+    }
+    @keyframes confFall{
+      0%{ transform: translateY(0) rotate(0deg); opacity: 1; }
+      100%{ transform: translateY(880px) rotate(360deg); opacity: 0.9; }
+    }
+
+    .fade-black{
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 520ms ease;
+      z-index: 50;
+    }
+    .fade-black.on{ opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="demo" id="demo">
+    <div class="fade-black" id="fadeBlack"></div>
+
+    <!-- SCENE 1: UPLOAD -->
+    <section class="scene active fadeOnly" id="scene1" aria-hidden="false">
+      <div class="center">
+        <div class="file-wrap">
+          <div class="upload-zone">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 16V6"/>
+              <path d="M8.5 9.5 12 6l3.5 3.5"/>
+              <path d="M6 18h12"/>
+            </svg>
+            <div class="title">Drop your textbook PDF here</div>
+            <div class="sub muted">Any subject. Any size.</div>
+          </div>
+
+          <div class="file-card" id="s1FileCard">
+            <svg class="pdf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M8 14h8"/>
+              <path d="M8 18h6"/>
+            </svg>
+            <div>
+              <div class="file-name">History Textbook.pdf</div>
+              <div class="file-meta muted">312 pages • 48 MB</div>
+            </div>
+          </div>
+
+          <div class="progress" aria-hidden="true">
+            <div class="bar" id="s1Progress"></div>
+          </div>
+          <div class="status muted2" id="s1Status">Uploading...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 2: PROCESSING -->
+    <section class="scene fadeOnly" id="scene2" aria-hidden="true">
+      <div class="top-note">Analyzing your textbook...</div>
+      <div class="center">
+        <div>
+          <div class="big-number" id="s2Counter">0</div>
+          <div class="levels-label">levels generated</div>
+          <div class="processing-sub">Breaking down History Textbook.pdf</div>
+          <div class="dots" aria-hidden="true">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-progress" aria-hidden="true">
+        <div class="bar" id="s2BottomBar"></div>
+      </div>
+    </section>
+
+    <!-- SCENE 3: LEVEL MAP (portrait) -->
+    <section class="scene fadeOnly" id="scene3" aria-hidden="true">
+      <div class="topbar">
+        <div class="xp">⚡ 0 XP</div>
+      </div>
+      <div class="map" id="map3">
+        <div class="map-stage" aria-hidden="true">
+          <!-- Portrait SVG: 390×790 viewBox, nodes spread full height -->
+          <svg class="path" viewBox="0 0 390 790" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="pathGrad" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#7C3AED" stop-opacity="1"/>
+                <stop offset="55%" stop-color="#7C3AED" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="#2A2A4E" stop-opacity="1"/>
+              </linearGradient>
+            </defs>
+            <!-- Path winds from node1 (195,680) up to node5 (164,140) and off screen -->
+            <path d="M195 680
+                     C 220 658, 268 606, 253 542
+                     C 240 486, 150 468, 136 406
+                     C 122 352, 228 320, 236 272
+                     C 244 232, 194 188, 164 140
+                     C 150 112, 178 64, 195 10"
+                  fill="none" stroke="url(#pathGrad)" stroke-width="7" stroke-linecap="round" />
+          </svg>
+          <div class="nodes">
+            <!-- node1: active — left 50%, top 680px -->
+            <div class="node unlocked pulse show" id="m3n1" style="left:50%; top:680px; transform:translateX(-50%) translateY(-50%) scale(1); opacity:1;">
+              <span>1</span>
+              <div class="node-label">The French Revolution</div>
+            </div>
+            <!-- node2: locked — left 65%, top 542px -->
+            <div class="node locked show" id="m3n2" style="left:65%; top:542px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+            <!-- node3: locked — left 35%, top 406px -->
+            <div class="node locked show" id="m3n3" style="left:35%; top:406px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+            <!-- node4: locked — left 61%, top 272px -->
+            <div class="node locked show" id="m3n4" style="left:61%; top:272px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+            <!-- node5: locked — left 42%, top 140px -->
+            <div class="node locked show" id="m3n5" style="left:42%; top:140px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4 bottom sheet overlays scene 3 map -->
+      <div class="sheet" id="sheet4">
+        <div class="handle"></div>
+        <div class="sheet-inner">
+          <span class="pill" style="background: rgba(124,58,237,.2); border: 1px solid rgba(124,58,237,.4); color: white; width: fit-content;">Level 1</span>
+          <div class="sheet-title">The French Revolution</div>
+          <div class="sheet-stats">
+            <span>3 lessons</span>
+            <span>1 question</span>
+          </div>
+          <div class="btn">▶ Start</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: LESSON SCREEN -->
+    <section class="scene fadeOnly" id="scene5" aria-hidden="true">
+      <div class="lesson-top">
+        <div class="progress-dots" aria-hidden="true">
+          <span class="pdot active"></span>
+          <span class="pdot"></span>
+          <span class="pdot"></span>
+        </div>
+        <div class="lesson-xp">⚡ 0 XP</div>
+      </div>
+      <div class="lesson-bar" aria-hidden="true"><div class="fill" id="s5Bar"></div></div>
+
+      <div style="margin-top:72px;">
+        <div class="lesson-badge">THE FRENCH REVOLUTION</div>
+        <div class="lesson-card">
+          <div class="lesson-kicker">LESSON 1 OF 3</div>
+          <div class="lesson-text" id="s5Text">
+            The French Revolution began in 1789 when the people of France rose up against King Louis XVI. They were angry about high taxes and food shortages while the royal family lived in luxury.
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-cta">
+        <div class="btn" style="width:100%;">Got it — next ▶</div>
+      </div>
+    </section>
+
+    <!-- SCENE 6: QUESTION SCREEN -->
+    <section class="scene fadeOnly" id="scene6" aria-hidden="true">
+      <div class="lesson-top">
+        <div class="progress-dots" aria-hidden="true">
+          <span class="pdot active"></span>
+          <span class="pdot active" style="width:8px;height:8px;"></span>
+          <span class="pdot"></span>
+        </div>
+        <div class="lesson-xp">⚡ 0 XP</div>
+      </div>
+      <div class="lesson-bar" aria-hidden="true"><div class="fill" id="s6Bar"></div></div>
+      <div style="margin-top:72px;">
+        <div class="lesson-badge">THE FRENCH REVOLUTION</div>
+        <div class="question">What year did the French Revolution begin?</div>
+        <div class="answers" id="answers">
+          <div class="answer" data-key="A"><span>A) 1776</span></div>
+          <div class="answer" data-key="B">
+            <span>B) 1789</span>
+            <svg class="check" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+          <div class="answer" data-key="C"><span>C) 1804</span></div>
+          <div class="answer" data-key="D"><span>D) 1812</span></div>
+        </div>
+      </div>
+      <div class="xp-float" id="xpFloat">+10 XP</div>
+    </section>
+
+    <!-- SCENE 7: LEVEL COMPLETE -->
+    <section class="scene fadeOnly complete" id="scene7" aria-hidden="true">
+      <div class="center-stack">
+        <div class="complete-inner">
+          <div class="trophy" id="trophy">🏆</div>
+          <div class="complete-title" id="completeTitle">LEVEL COMPLETE!</div>
+          <div class="stars" aria-hidden="true">
+            <span class="star" id="star1">⭐</span>
+            <span class="star" id="star2">⭐</span>
+            <span class="star" id="star3">⭐</span>
+          </div>
+          <div class="earned" id="earned">You earned 10 XP</div>
+          <div class="xpbar" aria-hidden="true"><div class="fill" id="xpFill"></div></div>
+        </div>
+      </div>
+      <div id="confettiHost" aria-hidden="true"></div>
+    </section>
+
+    <!-- SCENE 8: BACK TO MAP (portrait) -->
+    <section class="scene fadeOnly" id="scene8" aria-hidden="true">
+      <div class="topbar">
+        <div class="xp">⚡ 10 XP</div>
+      </div>
+      <div class="map gentleScale" id="map8">
+        <div class="map-stage" aria-hidden="true">
+          <svg class="path" viewBox="0 0 390 790" preserveAspectRatio="none">
+            <path d="M195 680
+                     C 220 658, 268 606, 253 542
+                     C 240 486, 150 468, 136 406
+                     C 122 352, 228 320, 236 272
+                     C 244 232, 194 188, 164 140
+                     C 150 112, 178 64, 195 10"
+                  fill="none" stroke="url(#pathGrad)" stroke-width="7" stroke-linecap="round" />
+          </svg>
+          <div class="nodes">
+            <div class="node complete show" id="m8n1" style="left:50%; top:680px; opacity:1; transform:translateX(-50%) translateY(-50%) scale(1);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5"/>
+              </svg>
+              <div class="node-label">The French Revolution</div>
+            </div>
+            <div class="node locked show" id="m8n2" style="left:65%; top:542px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <div class="node-lock" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  <rect x="5" y="11" width="14" height="10" rx="2"/>
+                </svg>
+              </div>
+              <div class="node-num" aria-hidden="true"><span>2</span></div>
+              <div class="node-label" id="m8Label2" style="opacity:0; color: rgba(255,255,255,.9);">Rise of Napoleon</div>
+            </div>
+            <div class="node locked show" id="m8n3" style="left:35%; top:406px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+            <div class="node locked show" id="m8n4" style="left:61%; top:272px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+            <div class="node locked show" id="m8n5" style="left:42%; top:140px; opacity:1; transform:translate(-50%,-50%) scale(1);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true">
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="5" y="11" width="14" height="10" rx="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Timeline: same as demo.html — 20s total loop
+    const BASE = [3000, 2000, 4000, 2000, 3000, 3000, 3000, 2000];
+    const SCALE = 20000 / BASE.reduce((a,b)=>a+b,0);
+    let D = BASE.map(ms => Math.round(ms * SCALE));
+    D[D.length - 1] += 20000 - D.reduce((a,b)=>a+b,0);
+    const oldScene3 = D[2];
+    D[2] = 1000;
+    D[D.length - 1] += (oldScene3 - D[2]);
+
+    const scenes = Array.from(document.querySelectorAll('.scene'));
+    const fadeBlack = document.getElementById('fadeBlack');
+
+    let current = 0;
+    let timers = [];
+    let intervals = [];
+    let rafs = [];
+
+    function clearAll(){
+      timers.forEach(t => clearTimeout(t));
+      intervals.forEach(i => clearInterval(i));
+      rafs.forEach(r => cancelAnimationFrame(r));
+      timers = []; intervals = []; rafs = [];
+    }
+
+    function t(fn, ms){ const id = setTimeout(fn, ms); timers.push(id); return id; }
+    function iv(fn, ms){ const id = setInterval(fn, ms); intervals.push(id); return id; }
+    function raf(fn){ const id = requestAnimationFrame(fn); rafs.push(id); return id; }
+
+    function showScene(idx){
+      scenes.forEach((s, i) => {
+        if (i === idx) return;
+        s.style.transition = 'none';
+        s.classList.remove('active');
+        void s.offsetHeight;
+        s.style.transition = '';
+        s.setAttribute('aria-hidden', 'true');
+      });
+      const target = scenes[idx];
+      target.setAttribute('aria-hidden', 'false');
+      target.classList.add('active');
+      current = idx;
+    }
+
+    function resetVisuals(){
+      const fc = document.getElementById('s1FileCard');
+      const p  = document.getElementById('s1Progress');
+      const st = document.getElementById('s1Status');
+      fc.classList.remove('show');
+      p.style.transition = 'none'; p.style.width = '0%';
+      st.className = 'status muted2'; st.textContent = 'Uploading...';
+
+      document.getElementById('s2Counter').textContent = '0';
+      const b2 = document.getElementById('s2BottomBar');
+      b2.style.transition = 'none'; b2.style.width = '0%';
+
+      document.getElementById('m3n1').classList.remove('tap');
+      document.getElementById('sheet4').classList.remove('show');
+
+      document.getElementById('s5Bar').style.width = '0%';
+      document.getElementById('s5Text').classList.remove('show');
+
+      document.getElementById('s6Bar').style.width = '0%';
+      const ans = Array.from(document.querySelectorAll('#answers .answer'));
+      ans.forEach(a => { a.classList.remove('in','correct','dim'); a.style.transition = ''; });
+      document.getElementById('xpFloat').className = 'xp-float';
+
+      document.getElementById('trophy').className = 'trophy';
+      document.getElementById('completeTitle').className = 'complete-title';
+      document.getElementById('star1').className = 'star';
+      document.getElementById('star2').className = 'star';
+      document.getElementById('star3').className = 'star';
+      document.getElementById('earned').className = 'earned';
+      const xpFill = document.getElementById('xpFill');
+      xpFill.style.transition = 'none'; xpFill.style.width = '0%';
+      document.getElementById('confettiHost').innerHTML = '';
+
+      const lbl2 = document.getElementById('m8Label2');
+      lbl2.style.transition = 'none'; lbl2.style.opacity = '0';
+
+      fadeBlack.classList.remove('on');
+    }
+
+    function runScene1(){
+      showScene(0);
+      const fc = document.getElementById('s1FileCard');
+      const p  = document.getElementById('s1Progress');
+      const st = document.getElementById('s1Status');
+      const appearDelay = Math.round(500 * SCALE);
+      const uploadDur   = Math.round(1500 * SCALE);
+      t(() => fc.classList.add('show'), appearDelay);
+      t(() => { p.style.transition = `width ${uploadDur}ms ease`; p.style.width = '100%'; }, appearDelay + 80);
+      t(() => { st.textContent = 'Upload complete ✓'; st.style.color = 'var(--green)'; }, appearDelay + 80 + uploadDur);
+    }
+
+    function runScene2(){
+      showScene(1);
+      const counter  = document.getElementById('s2Counter');
+      const bottom   = document.getElementById('s2BottomBar');
+      const total    = 247;
+      counter.textContent = '0';
+      const duration = Math.max(600, Math.min(D[1] - 120, Math.round(1500 * SCALE)));
+      const start    = performance.now();
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        counter.textContent = String(Math.floor(p * total));
+        if (p < 1) raf(tick); else counter.textContent = String(total);
+      };
+      raf(tick);
+      bottom.style.transition = `width ${D[1]}ms linear`;
+      bottom.style.width = '100%';
+    }
+
+    function runScene3(){ showScene(2); }
+
+    function runScene4(){
+      const n1    = document.getElementById('m3n1');
+      const sheet = document.getElementById('sheet4');
+      t(() => { n1.classList.add('tap'); },    Math.round(140 * SCALE));
+      t(() => { n1.classList.remove('tap'); }, Math.round(520 * SCALE));
+      t(() => sheet.classList.add('show'),     Math.round(260 * SCALE));
+    }
+
+    function runScene5(){
+      showScene(3);
+      const bar  = document.getElementById('s5Bar');
+      const text = document.getElementById('s5Text');
+      t(() => { bar.style.width = '33%'; }, 60);
+      t(() => { text.classList.add('show'); }, Math.round(200 * SCALE));
+    }
+
+    function runScene6(){
+      showScene(4);
+      const bar     = document.getElementById('s6Bar');
+      const answers = Array.from(document.querySelectorAll('#answers .answer'));
+      const xpFloat = document.getElementById('xpFloat');
+      t(() => { bar.style.width = '66%'; }, 60);
+      const inDelay = Math.round(100 * SCALE);
+      answers.forEach((a, i) => t(() => a.classList.add('in'), i * inDelay));
+      const correctAt = Math.round(1500 * SCALE);
+      t(() => {
+        const b = document.querySelector('#answers .answer[data-key="B"]');
+        b.style.transition = 'transform 140ms ease';
+        b.style.transform  = 'translateX(0) scale(.97)';
+        t(() => { b.style.transform = 'translateX(0) scale(1)'; }, 140);
+        t(() => {
+          b.classList.add('correct');
+          answers.forEach(a => { if (a !== b) a.classList.add('dim'); });
+          const r    = b.getBoundingClientRect();
+          const host = document.getElementById('demo').getBoundingClientRect();
+          xpFloat.style.left = `${r.left - host.left + r.width - 80}px`;
+          xpFloat.style.top  = `${r.top  - host.top  + 14}px`;
+          xpFloat.classList.add('fly');
+        }, 180);
+      }, correctAt);
+    }
+
+    function runScene7(){
+      showScene(5);
+      const trophy       = document.getElementById('trophy');
+      const title        = document.getElementById('completeTitle');
+      const star1        = document.getElementById('star1');
+      const star2        = document.getElementById('star2');
+      const star3        = document.getElementById('star3');
+      const earned       = document.getElementById('earned');
+      const xpFill       = document.getElementById('xpFill');
+      const host         = document.getElementById('confettiHost');
+
+      t(() => trophy.classList.add('in'),  Math.round(120 * SCALE));
+      t(() => title.classList.add('in'),   Math.round(380 * SCALE));
+      t(() => star1.classList.add('in'),   Math.round(520 * SCALE));
+      t(() => star2.classList.add('in'),   Math.round(720 * SCALE));
+      t(() => star3.classList.add('in'),   Math.round(920 * SCALE));
+      t(() => earned.classList.add('in'),  Math.round(980 * SCALE));
+      t(() => { xpFill.style.transition = 'width 800ms ease'; xpFill.style.width = '15%'; }, Math.round(1100 * SCALE));
+
+      const colors = ['#7C3AED', '#FBBF24', '#22C55E', '#FFFFFF'];
+      for (let i = 0; i < 30; i++){
+        const el  = document.createElement('div');
+        el.className = 'confetti';
+        const size  = 5 + Math.random() * 5;
+        el.style.left              = `${Math.random() * 390}px`;
+        el.style.width             = `${size}px`;
+        el.style.height            = `${size}px`;
+        el.style.background        = colors[Math.floor(Math.random() * colors.length)];
+        el.style.animationDuration = `${1200 + Math.random() * 800}ms`;
+        el.style.animationDelay    = `${Math.random() * 800}ms`;
+        host.appendChild(el);
+      }
+      t(() => { host.innerHTML = ''; }, Math.max(0, D[6] - 300));
+    }
+
+    function runScene8(){
+      showScene(6);
+      const label2 = document.getElementById('m8Label2');
+      const node2  = document.getElementById('m8n2');
+      node2.classList.remove('pulse', 'flash', 'unlockedState');
+      label2.style.transition = 'none'; label2.style.opacity = '0';
+
+      t(() => {
+        const lock = node2.querySelector('.node-lock');
+        if (lock) lock.style.opacity = '0';
+      }, Math.round(220 * SCALE));
+      t(() => { node2.classList.add('flash'); }, Math.round(420 * SCALE));
+      t(() => {
+        node2.classList.remove('flash');
+        node2.classList.add('unlockedState', 'pulse');
+        label2.style.transition = 'opacity 420ms ease';
+        label2.style.opacity    = '1';
+      }, Math.round(620 * SCALE));
+
+      const fadeAt = Math.round(1500 * SCALE);
+      t(() => fadeBlack.classList.add('on'), fadeAt);
+      t(() => { clearAll(); resetVisuals(); start(); }, Math.min(D[7] - 10, fadeAt + 620));
+    }
+
+    const runners = [runScene1, runScene2, runScene3, runScene4, runScene5, runScene6, runScene7, runScene8];
+
+    function start(){
+      clearAll();
+      resetVisuals();
+      let at = 0;
+      runners.forEach((fn, i) => { t(() => fn(), at); at += D[i]; });
+    }
+
+    start();
+  </script>
+</body>
+</html>

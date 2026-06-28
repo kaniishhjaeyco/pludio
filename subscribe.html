@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-black">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pludio — Subscribe</title>
+  <meta name="description" content="Pick a plan and start turning your textbooks into playable levels. Monthly or yearly — cancel anytime." />
+  <link rel='icon' type='image/png' href='pludio-icon.png'>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            tint: '#6823FF',
+            dark_tint: '#4c12c9',
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 5.5rem;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+    .glass-card {
+      background: linear-gradient(to top, rgba(132, 41, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 100%);
+    }
+    .beam-top-right {
+      background: radial-gradient(ellipse at center, rgba(134, 39, 255, 0.35) 0%, transparent 70%);
+      filter: blur(40px);
+    }
+    .beam-left {
+      background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.15) 0%, transparent 75%);
+      filter: blur(60px);
+    }
+    .page-glow {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .page-glow-purple {
+      bottom: 0;
+      width: 80%;
+      height: min(40vh, 420px);
+      background: radial-gradient(ellipse at center, rgba(134, 39, 255, 0.12) 0%, transparent 70%);
+      filter: blur(80px);
+    }
+    .page-glow-cyan {
+      top: 10%;
+      width: 90%;
+      height: min(60vh, 600px);
+      background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.12) 0%, transparent 75%);
+      filter: blur(100px);
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+  <div class="page-shell bg-black min-h-screen relative text-white overflow-x-hidden isolate">
+
+    <canvas id="star-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></canvas>
+
+    <!-- Ambient glows (fixed — do not extend scroll height) -->
+    <div class="page-glow page-glow-purple pointer-events-none" aria-hidden="true"></div>
+    <div class="page-glow page-glow-cyan pointer-events-none" aria-hidden="true"></div>
+
+    <!-- Beam effects -->
+    <div class="fixed -top-10 right-[5%] w-[50vw] sm:w-[35vw] max-w-[520px] h-[520px] beam-top-right pointer-events-none z-[1]" aria-hidden="true"></div>
+    <div class="fixed top-[30%] -left-[10%] w-[40vw] max-w-[400px] h-[400px] beam-left pointer-events-none z-[1]" aria-hidden="true"></div>
+
+    <div class="mx-auto w-full max-w-full sm:max-w-7xl relative z-10">
+
+      <!-- Navbar -->
+      <header class="fixed top-0 left-0 right-0 py-2 sm:py-3 w-full z-50">
+        <nav class="flex justify-center px-4">
+          <div class="relative flex w-[90%] sm:w-full max-w-5xl items-center justify-between rounded-full border border-white/10 bg-white/5 bg-gradient-to-r from-indigo-900/20 via-indigo-700/15 to-indigo-900/20 px-3 sm:px-6 py-2 sm:py-2.5 min-h-[52px] backdrop-blur-sm">
+            <a aria-label="Pludio home" href="index.html" class="flex-shrink-0 flex items-center gap-2.5">
+              <img src="pludio-icon.png" alt="" class="h-9 sm:h-10 w-auto rounded-[10px]" />
+              <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Pludio</span>
+            </a>
+            <div class="hidden sm:flex items-center gap-6 text-sm text-gray-300">
+              <a href="index.html#features" class="hover:text-white transition-colors">Features</a>
+              <a href="index.html#how-it-works" class="hover:text-white transition-colors">How it works</a>
+              <a href="index.html#testimonials" class="hover:text-white transition-colors">Reviews</a>
+              <a href="index.html#faq" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+            <a href="index.html" class="bg-tint hover:bg-dark_tint transition-all duration-200 rounded-xl border border-white/10 py-2 px-4 sm:px-6 text-sm font-bold text-white whitespace-nowrap">
+              Back to home
+            </a>
+          </div>
+        </nav>
+      </header>
+
+      <!-- Pricing -->
+      <section class="px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28 pt-32 sm:pt-44 relative min-h-screen">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-12 sm:mb-16">
+            <a href="index.html#waitlist" class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-purple-600/5 backdrop-blur-sm mb-6">
+              <span class="text-base">🎮</span>
+              <span class="text-sm font-semibold text-white">Simple pricing. Cancel anytime.</span>
+            </a>
+            <h1 class="text-white font-bold tracking-tight text-[40px] sm:text-[52px] leading-[1.05]">
+              Choose your plan
+            </h1>
+            <p class="max-w-2xl mx-auto mt-4 sm:mt-6 text-[#CCCAD1] text-lg sm:text-xl leading-relaxed font-medium">
+              Upload your textbooks, play through every level, and lock knowledge in. One plan, all features.
+            </p>
+          </div>
+
+          <div class="grid gap-6 sm:gap-8 md:grid-cols-2 max-w-3xl mx-auto items-stretch">
+
+            <!-- Monthly -->
+            <div class="relative overflow-hidden rounded-2xl backdrop-blur-md border border-white/10 shadow-[0_0_40px_-10px_rgba(0,0,0,.6)] p-8 glass-card flex flex-col">
+              <span class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/8"></span>
+              <div class="relative z-10 flex flex-col flex-1">
+                <h2 class="text-xl font-bold text-white mb-2">Monthly</h2>
+                <p class="text-gray-400 text-sm mb-6">Flexible month-to-month access.</p>
+                <div class="mb-6">
+                  <span class="text-4xl sm:text-5xl font-bold text-white">RM49</span>
+                  <span class="text-gray-400 text-base">/month</span>
+                </div>
+                <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-1">
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Unlimited textbook uploads</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Auto-generated playable levels</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Spaced recall questions</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Cancel anytime</span>
+                  </li>
+                </ul>
+                <button type="button" class="w-full bg-white/5 hover:bg-white/10 border border-white/15 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
+                  Get Started
+                </button>
+              </div>
+            </div>
+
+            <!-- Yearly -->
+            <div class="relative overflow-hidden rounded-2xl backdrop-blur-md border border-purple-500/40 shadow-[0_0_50px_-10px_rgba(104,35,255,0.5)] p-8 glass-card flex flex-col">
+              <span class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-purple-400/20"></span>
+              <div class="absolute top-5 right-5 z-20">
+                <span class="inline-block rounded-full bg-tint text-white text-xs font-bold px-3 py-1">Save RM189</span>
+              </div>
+              <div class="relative z-10 flex flex-col flex-1">
+                <h2 class="text-xl font-bold text-white mb-2">Yearly</h2>
+                <p class="text-gray-400 text-sm mb-6">Best value — two months free.</p>
+                <div class="mb-1">
+                  <span class="text-4xl sm:text-5xl font-bold text-white">RM399</span>
+                  <span class="text-gray-400 text-base">/year</span>
+                </div>
+                <p class="text-purple-300 text-sm mb-6">Just RM33.25/month, billed annually</p>
+                <ul class="space-y-3 mb-8 text-sm text-gray-300 flex-1">
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Everything in Monthly</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>2 months free vs. monthly</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Priority access to new features</span>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Cancel anytime</span>
+                  </li>
+                </ul>
+                <button type="button" class="w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
+                  Get Started
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <p class="text-center text-gray-500 text-sm mt-10">
+            Questions? <a href="index.html#faq" class="text-purple-300 hover:text-purple-200 transition-colors">Check the FAQ</a> or reach out — we're here to help.
+          </p>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="relative pt-8 sm:pt-12 pb-10 sm:pb-12 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(246,146,254,0.15)_0%,transparent_55%)] pointer-events-none"></div>
+        <div class="px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="flex flex-col items-center text-center gap-4">
+            <p class="text-gray-500 text-xs pb-1">© 2025 Pludio</p>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Star canvas
+    (function initStars() {
+      const canvas = document.getElementById('star-canvas');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let w, h;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+
+      function createStars() {
+        stars = [];
+        const count = Math.floor((w * h) / 8000);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.2 + 0.3,
+            base: Math.random() * 0.5 + 0.2,
+            speed: Math.random() * 0.02 + 0.005,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+
+      function draw(t) {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          const opacity = s.base + Math.sin(t * s.speed + s.phase) * 0.35;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0.1, Math.min(1, opacity)) + ')';
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      createStars();
+      window.addEventListener('resize', () => { resize(); createStars(); });
+      requestAnimationFrame(draw);
+    })();
+  </script>
+</body>
+</html>
