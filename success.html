@@ -50,6 +50,14 @@
       background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.12) 0%, transparent 75%);
       filter: blur(100px);
     }
+
+    /* Mobile GPUs choke on large-radius blur layers — especially when stacked
+       and composited over the animated star canvas. Dial the blur radii down
+       on small screens so the page paints reliably instead of blanking white. */
+    @media (max-width: 640px) {
+      .page-glow-purple { filter: blur(36px); }
+      .page-glow-cyan { filter: blur(44px); }
+    }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
@@ -63,9 +71,30 @@
       <div class="relative overflow-hidden rounded-2xl backdrop-blur-md border border-purple-500/40 shadow-[0_0_50px_-10px_rgba(104,35,255,0.5)] p-8 sm:p-12 glass-card max-w-lg w-full text-center">
         <span class="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-purple-400/20"></span>
         <div class="relative z-10">
+          <!-- Step indicator -->
+          <div class="mb-8 flex items-center justify-center" aria-label="Step 3 of 3">
+            <div class="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm px-3 sm:px-5 py-2.5">
+              <!-- Step 1 — done -->
+              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 border border-green-400/40">
+                <svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="h-px w-4 sm:w-8 bg-white/15"></span>
+              <!-- Step 2 — done -->
+              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 border border-green-400/40">
+                <svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="h-px w-4 sm:w-8 bg-white/15"></span>
+              <!-- Step 3 — active -->
+              <div class="flex items-center gap-2">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-tint text-white text-xs font-bold">3</span>
+                <span class="text-xs font-bold text-white">You're done!</span>
+              </div>
+            </div>
+          </div>
           <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-tint/20 border border-purple-400/30">
             <svg class="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
+          <p class="text-sm font-semibold text-purple-300 mb-3">Step 3 of 3 — You're done!</p>
           <h1 class="text-white font-bold tracking-tight text-[32px] sm:text-[40px] leading-[1.1] mb-4">
             You're all set! 🎉
           </h1>
@@ -73,13 +102,10 @@
             Your <span class="text-white font-semibold">Pludio Premium</span> subscription is active.
           </p>
           <p class="text-[#CCCAD1] text-base leading-relaxed mb-8">
-            Head back to the Pludio app to start playing through the syllabus, level by level. Your premium access is ready and waiting.
+            <span class="text-white font-semibold">You can now close this browser tab and go back to the Pludio app.</span> Your premium access is already active — all chapters are unlocked and waiting for you.
           </p>
-          <a href="index.html" class="inline-block w-full bg-tint hover:bg-dark_tint border border-white/10 transition-all duration-200 rounded-xl py-3 px-6 font-bold text-white">
-            Return to the app
-          </a>
-          <p class="text-gray-500 text-sm mt-6">
-            A confirmation has been sent to your email. You can close this tab.
+          <p class="text-gray-500 text-sm">
+            A confirmation has been sent to your email.
           </p>
         </div>
       </div>
@@ -89,12 +115,23 @@
   <script>
     (function initStars() {
       const canvas = document.getElementById('star-canvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      let stars = [], w, h;
+      if (!ctx) return;
+
+      // Animate only on larger screens with motion allowed. On mobile (or
+      // reduced motion) render a static starfield — a perpetual canvas repaint
+      // behind the blur/glass layers forces mobile GPUs to re-composite every
+      // frame, which can pin the compositor and blank the page to white.
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isSmallScreen = window.matchMedia('(max-width: 640px)').matches;
+      const animate = !reduceMotion && !isSmallScreen;
+
+      let stars = [], w, h, rafId = null;
       function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
       function createStars() {
         stars = [];
-        const count = Math.floor((w * h) / 8000);
+        const count = Math.min(160, Math.floor((w * h) / 8000));
         for (let i = 0; i < count; i++) {
           stars.push({
             x: Math.random() * w, y: Math.random() * h,
@@ -103,20 +140,28 @@
           });
         }
       }
-      function draw(t) {
+      function render(t) {
         ctx.clearRect(0, 0, w, h);
         for (const s of stars) {
-          const opacity = s.base + Math.sin(t * s.speed + s.phase) * 0.35;
+          const opacity = animate
+            ? s.base + Math.sin(t * s.speed + s.phase) * 0.35
+            : s.base + 0.2;
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0.1, Math.min(1, opacity)) + ')';
           ctx.fill();
         }
-        requestAnimationFrame(draw);
       }
-      resize(); createStars();
-      window.addEventListener('resize', () => { resize(); createStars(); });
-      requestAnimationFrame(draw);
+      function loop(t) { render(t); rafId = requestAnimationFrame(loop); }
+      function start() { if (animate && rafId === null) rafId = requestAnimationFrame(loop); }
+      function stop() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
+
+      resize(); createStars(); render(0);
+      window.addEventListener('resize', () => { resize(); createStars(); render(0); });
+      if (animate) {
+        document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
+        start();
+      }
     })();
   </script>
 </body>

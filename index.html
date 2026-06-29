@@ -103,6 +103,17 @@
       background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.12) 0%, transparent 75%);
       filter: blur(100px);
     }
+
+    /* Mobile GPUs choke on large-radius blur layers — especially when stacked
+       and composited over the animated star canvas. Dial the blur radii down
+       on small screens so the page paints reliably instead of blanking white. */
+    @media (max-width: 640px) {
+      .beam-top-right { filter: blur(20px); }
+      .beam-left { filter: blur(24px); }
+      .beam-bottom { filter: blur(36px); }
+      .page-glow-purple { filter: blur(36px); }
+      .page-glow-cyan { filter: blur(44px); }
+    }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
@@ -332,9 +343,22 @@
     // Star canvas
     (function initStars() {
       const canvas = document.getElementById('star-canvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Only animate continuously on larger screens with motion allowed. On
+      // mobile (or when the user prefers reduced motion) we render a static
+      // starfield: a perpetual canvas repaint behind the page's backdrop-blur
+      // and glow layers forces mobile GPUs to re-composite every frame, which
+      // can pin the compositor and blank the page to white.
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isSmallScreen = window.matchMedia('(max-width: 640px)').matches;
+      const animate = !reduceMotion && !isSmallScreen;
+
       let stars = [];
       let w, h;
+      let rafId = null;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -343,7 +367,9 @@
 
       function createStars() {
         stars = [];
-        const count = Math.floor((w * h) / 8000);
+        // Cap the star count so dense/high-res mobile viewports don't allocate
+        // thousands of draw calls.
+        const count = Math.min(160, Math.floor((w * h) / 8000));
         for (let i = 0; i < count; i++) {
           stars.push({
             x: Math.random() * w,
@@ -356,22 +382,45 @@
         }
       }
 
-      function draw(t) {
+      function render(t) {
         ctx.clearRect(0, 0, w, h);
         for (const s of stars) {
-          const opacity = s.base + Math.sin(t * s.speed + s.phase) * 0.35;
+          const opacity = animate
+            ? s.base + Math.sin(t * s.speed + s.phase) * 0.35
+            : s.base + 0.2;
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0.1, Math.min(1, opacity)) + ')';
           ctx.fill();
         }
-        requestAnimationFrame(draw);
+      }
+
+      function loop(t) {
+        render(t);
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function start() {
+        if (animate && rafId === null) rafId = requestAnimationFrame(loop);
+      }
+
+      function stop() {
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       }
 
       resize();
       createStars();
-      window.addEventListener('resize', () => { resize(); createStars(); });
-      requestAnimationFrame(draw);
+      render(0);
+
+      window.addEventListener('resize', () => { resize(); createStars(); render(0); });
+
+      if (animate) {
+        // Pause when the tab/page isn't visible to save battery and GPU.
+        document.addEventListener('visibilitychange', () => {
+          document.hidden ? stop() : start();
+        });
+        start();
+      }
     })();
   </script>
 </body>

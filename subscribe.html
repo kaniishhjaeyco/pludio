@@ -33,6 +33,12 @@
     };
   </script>
   <style>
+    /* Apply background immediately via plain CSS so there's no white flash
+       before the Tailwind CDN loads. */
+    html, body {
+      background-color: #000;
+      color: #fff;
+    }
     html {
       scroll-behavior: smooth;
       scroll-padding-top: 5.5rem;
@@ -41,6 +47,52 @@
     body {
       font-family: Inter, system-ui, sans-serif;
       overflow-x: hidden;
+    }
+
+    /* Branded loading overlay shown until the page is ready */
+    #page-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      background-color: #000;
+      transition: opacity 0.4s ease;
+    }
+    #page-loader.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .loader-brand img {
+      height: 2.75rem;
+      width: auto;
+      border-radius: 10px;
+    }
+    .loader-brand span {
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .loader-spinner {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 9999px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #6823FF;
+      animation: loader-spin 0.8s linear infinite;
+    }
+    @keyframes loader-spin {
+      to { transform: rotate(360deg); }
     }
     .glass-card {
       background: linear-gradient(to top, rgba(132, 41, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 100%);
@@ -74,9 +126,28 @@
       background: radial-gradient(ellipse at center, rgba(39, 216, 255, 0.12) 0%, transparent 75%);
       filter: blur(100px);
     }
+
+    /* Mobile GPUs choke on large-radius blur layers — especially when stacked
+       and composited over the animated star canvas. Dial the blur radii down
+       on small screens so the page paints reliably instead of blanking white. */
+    @media (max-width: 640px) {
+      .beam-top-right { filter: blur(20px); }
+      .beam-left { filter: blur(24px); }
+      .page-glow-purple { filter: blur(36px); }
+      .page-glow-cyan { filter: blur(44px); }
+    }
   </style>
 </head>
 <body class="bg-black text-white antialiased">
+  <!-- Branded loading state — rendered immediately, before Tailwind/JS load -->
+  <div id="page-loader" role="status" aria-label="Loading Pludio">
+    <div class="loader-brand">
+      <img src="pludio-icon.png" alt="" />
+      <span>Pludio</span>
+    </div>
+    <div class="loader-spinner" aria-hidden="true"></div>
+  </div>
+
   <div class="page-shell bg-black min-h-screen relative text-white overflow-x-hidden isolate">
 
     <canvas id="star-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true"></canvas>
@@ -114,16 +185,63 @@
       <section class="px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28 pt-32 sm:pt-44 relative min-h-screen">
         <div class="max-w-5xl mx-auto">
           <div class="text-center mb-12 sm:mb-16">
-            <div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-purple-600/5 backdrop-blur-sm mb-6">
-              <span class="text-base">🎮</span>
-              <span class="text-sm font-semibold text-white">Simple pricing. Cancel anytime.</span>
+            <!-- Step indicator -->
+            <div class="mb-8 flex items-center justify-center" aria-label="Step 2 of 3">
+              <div class="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm px-3 sm:px-5 py-2.5">
+                <!-- Step 1 — done -->
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 border border-green-400/40">
+                    <svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  <span class="hidden sm:inline text-xs font-semibold text-gray-400">Upgrade in app</span>
+                </div>
+                <span class="h-px w-4 sm:w-8 bg-white/15"></span>
+                <!-- Step 2 — active -->
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-tint text-white text-xs font-bold">2</span>
+                  <span class="text-xs font-bold text-white">Choose your plan</span>
+                </div>
+                <span class="h-px w-4 sm:w-8 bg-white/15"></span>
+                <!-- Step 3 — pending -->
+                <div class="flex items-center gap-2">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 border border-white/15 text-gray-400 text-xs font-bold">3</span>
+                  <span class="hidden sm:inline text-xs font-semibold text-gray-400">Back to app</span>
+                </div>
+              </div>
             </div>
+            <p class="text-sm font-semibold text-purple-300 mb-3">Step 2 of 3 — Choose your plan</p>
             <h1 class="text-white font-bold tracking-tight text-[40px] sm:text-[52px] leading-[1.05]">
               Choose your plan
             </h1>
             <p class="max-w-2xl mx-auto mt-4 sm:mt-6 text-[#CCCAD1] text-lg sm:text-xl leading-relaxed font-medium">
               Pick your age and subject, play through every level, and lock knowledge in — all on the Malaysian syllabus. One plan, all features.
             </p>
+
+            <!-- Account confirmation -->
+            <div id="account-box" class="hidden max-w-xl mx-auto mt-8 rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-500/15 to-purple-600/10 backdrop-blur-sm px-6 py-5 text-left shadow-[0_0_40px_-12px_rgba(104,35,255,0.5)]">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-tint/20 border border-purple-400/30">
+                  <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206"/></svg>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-purple-200/90 uppercase tracking-wide">You're subscribing for</p>
+                  <p id="account-email" class="mt-1 text-lg sm:text-xl font-bold text-white break-all">—</p>
+                </div>
+              </div>
+              <p class="mt-4 flex items-start gap-2 text-sm text-[#CCCAD1] leading-relaxed">
+                <svg class="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>You were redirected here from the Pludio app to complete your payment securely. After paying, just go back to the app — your premium access will unlock automatically.</span>
+              </p>
+            </div>
+
+            <!-- Shown when no email is present in the URL -->
+            <div id="no-email-box" class="hidden max-w-xl mx-auto mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 backdrop-blur-sm px-6 py-5 text-left">
+              <p class="flex items-start gap-3 text-sm sm:text-base text-amber-100 leading-relaxed">
+                <svg class="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                <span>It looks like you didn't come from the Pludio app. Please open the app, go to <span class="font-semibold text-white">Settings</span>, and tap <span class="font-semibold text-white">Get Premium</span> to subscribe.</span>
+              </p>
+            </div>
+
             <div id="checkout-error" class="hidden max-w-xl mx-auto mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-3 text-sm text-red-200"></div>
           </div>
 
@@ -223,12 +341,42 @@
   </div>
 
   <script>
+    // Hide the branded loader once the page has finished loading.
+    (function hideLoader() {
+      const loader = document.getElementById('page-loader');
+      if (!loader) return;
+      function dismiss() {
+        loader.classList.add('is-hidden');
+        setTimeout(() => loader.remove(), 450);
+      }
+      if (document.readyState === 'complete') {
+        dismiss();
+      } else {
+        window.addEventListener('load', dismiss);
+        // Safety fallback so the loader never gets stuck.
+        setTimeout(dismiss, 4000);
+      }
+    })();
+
     // Star canvas
     (function initStars() {
       const canvas = document.getElementById('star-canvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Only animate continuously on larger screens with motion allowed. On
+      // mobile (or when the user prefers reduced motion) we render a static
+      // starfield: a perpetual canvas repaint behind the page's backdrop-blur
+      // and glow layers forces mobile GPUs to re-composite every frame, which
+      // can pin the compositor and blank the page to white.
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isSmallScreen = window.matchMedia('(max-width: 640px)').matches;
+      const animate = !reduceMotion && !isSmallScreen;
+
       let stars = [];
       let w, h;
+      let rafId = null;
 
       function resize() {
         w = canvas.width = window.innerWidth;
@@ -237,7 +385,9 @@
 
       function createStars() {
         stars = [];
-        const count = Math.floor((w * h) / 8000);
+        // Cap the star count so dense/high-res mobile viewports don't allocate
+        // thousands of draw calls.
+        const count = Math.min(160, Math.floor((w * h) / 8000));
         for (let i = 0; i < count; i++) {
           stars.push({
             x: Math.random() * w,
@@ -250,22 +400,45 @@
         }
       }
 
-      function draw(t) {
+      function render(t) {
         ctx.clearRect(0, 0, w, h);
         for (const s of stars) {
-          const opacity = s.base + Math.sin(t * s.speed + s.phase) * 0.35;
+          const opacity = animate
+            ? s.base + Math.sin(t * s.speed + s.phase) * 0.35
+            : s.base + 0.2;
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.fillStyle = 'rgba(255,255,255,' + Math.max(0.1, Math.min(1, opacity)) + ')';
           ctx.fill();
         }
-        requestAnimationFrame(draw);
+      }
+
+      function loop(t) {
+        render(t);
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function start() {
+        if (animate && rafId === null) rafId = requestAnimationFrame(loop);
+      }
+
+      function stop() {
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       }
 
       resize();
       createStars();
-      window.addEventListener('resize', () => { resize(); createStars(); });
-      requestAnimationFrame(draw);
+      render(0);
+
+      window.addEventListener('resize', () => { resize(); createStars(); render(0); });
+
+      if (animate) {
+        // Pause when the tab/page isn't visible to save battery and GPU.
+        document.addEventListener('visibilitychange', () => {
+          document.hidden ? stop() : start();
+        });
+        start();
+      }
     })();
 
     // Stripe Checkout
@@ -273,6 +446,9 @@
       const params = new URLSearchParams(window.location.search);
       const email = (params.get('email') || '').trim();
       const errorBox = document.getElementById('checkout-error');
+      const accountBox = document.getElementById('account-box');
+      const accountEmail = document.getElementById('account-email');
+      const noEmailBox = document.getElementById('no-email-box');
       const buttons = Array.from(document.querySelectorAll('[data-checkout]'));
 
       function showError(message) {
@@ -282,9 +458,14 @@
       }
 
       if (!email) {
-        showError('We couldn’t find your email. Please reopen this page from the Pludio app so we can link your subscription.');
+        if (noEmailBox) noEmailBox.classList.remove('hidden');
         buttons.forEach((btn) => { btn.disabled = true; });
         return;
+      }
+
+      if (accountBox && accountEmail) {
+        accountEmail.textContent = email;
+        accountBox.classList.remove('hidden');
       }
 
       async function startCheckout(btn) {
