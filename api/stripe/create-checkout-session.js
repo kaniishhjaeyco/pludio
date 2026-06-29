@@ -12,8 +12,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Pludio Premium plan price IDs, keyed by billing interval.
 const PRICE_IDS = {
-  monthly: 'price_1TnGCr4Yqs0nQW3T0VKVwrSx',
-  yearly: 'price_1TnGDa4Yqs0nQW3TTtJbs2QN',
+  monthly: 'price_1TnbAGHNXHGsdb3rlxg8BD7V',
+  yearly: 'price_1TnbBAHNXHGsdb3rQq2pNmle',
 };
 
 function getOrigin(req) {
